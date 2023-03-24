@@ -5,10 +5,10 @@ from .models import VideoAllProxy, VideoPublishedProxy
 class VideoAllAdmin(admin.ModelAdmin):
     """ Admin model class Video
     """
-    list_display = ['title', 'id', 'video_id', 'is_published']
+    list_display = ['title', 'id', 'state', 'video_id', 'is_published']
     search_fields = ['title']
-    list_filter = ['active']
-    readonly_fields = ['id', 'is_published']
+    list_filter = ['state', 'active']
+    readonly_fields = ['id', 'is_published', 'publish_timestamp']
 
     # def published(self, obj, *args, **kwargs):
     #     return obj.active
