@@ -41,6 +41,7 @@ SYSTEM_APPS = [
 
 PROJECT_APPS = [
     'videos.apps.VideosConfig',
+    'playlists.apps.PlaylistsConfig',
 ]
 
 INSTALLED_APPS = SYSTEM_APPS + PROJECT_APPS

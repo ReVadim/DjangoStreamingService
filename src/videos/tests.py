@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.utils import timezone
 from django.utils.text import slugify
-from .models import Video
+from src.videos.models import Video
 from src.djangoflix.db.models import PublishStateOptions
 
 
