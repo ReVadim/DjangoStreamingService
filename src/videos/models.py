@@ -42,6 +42,10 @@ class Video(models.Model):
     def is_published(self):
         return self.active
 
+    def get_playlist_ids(self):
+        # self.<foreigned_obj>_set.all()
+        return list(self.playlist_featured.all().values_list('id', flat=True))
+
 
 class VideoAllProxy(Video):
     """ Proxy model that displays all videos
