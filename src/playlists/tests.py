@@ -7,6 +7,13 @@ from src.djangoflix.db.models import PublishStateOptions
 
 
 class PlaylistModelTestCase(TestCase):
+    def create_show_with_seasons(self):
+        the_office = Playlist.objects.create(title='The Office Series')
+        season_1 = Playlist.objects.create(title='The Office Series Season 1', parent=the_office, order=1)
+        season_2 = Playlist.objects.create(title='The Office Series Season 2', parent=the_office, order=2)
+        season_3 = Playlist.objects.create(title='The Office Series Season 3', parent=the_office, order=3)
+        self.show = the_office
+
     def create_videos(self):
         video_1 = Video.objects.create(title='Video_title', video_id='123abc')
         video_2 = Video.objects.create(title='Second_title', video_id='456def')
@@ -18,6 +25,7 @@ class PlaylistModelTestCase(TestCase):
 
     def setUp(self):
         self.create_videos()
+        self.create_show_with_seasons()
         self.obj_1 = Playlist.objects.create(
             title='Test title', description='Test description', video=self.video
         )
@@ -28,6 +36,11 @@ class PlaylistModelTestCase(TestCase):
         obj_2.videos.set(self.video_queryset)
         obj_2.save()
         self.obj_2 = obj_2
+
+    def test_show_has_seasons(self):
+        seasons = self.show.playlist_set.all()
+        self.assertTrue(seasons.exists())
+        self.assertEqual(seasons.count(), 3)
 
     def test_playlist_video(self):
         self.assertEqual(self.obj_1.video, self.video)
@@ -63,11 +76,11 @@ class PlaylistModelTestCase(TestCase):
 
     def test_created_count(self):
         queryset = Playlist.objects.all()
-        self.assertEqual(queryset.count(), 2)
+        self.assertEqual(queryset.count(), 6)
 
     def test_draft_case(self):
         qs = Playlist.objects.filter(state=PublishStateOptions.DRAFT)
-        self.assertEqual(qs.count(), 1)
+        self.assertEqual(qs.count(), 5)
 
     def test_publish_case(self):
         qs = Playlist.objects.filter(state=PublishStateOptions.PUBLISH)

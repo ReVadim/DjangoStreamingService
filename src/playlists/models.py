@@ -27,6 +27,8 @@ class PlaylistManager(models.Manager):
 class Playlist(models.Model):
     """ Main Video model
     """
+    parent = models.ForeignKey('self', null=True, on_delete=models.SET_NULL)
+    order = models.IntegerField(default=1)
     title = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
     slug = models.SlugField(blank=True, null=True)
