@@ -27,9 +27,16 @@ class PlaylistManager(models.Manager):
 class Playlist(models.Model):
     """ Main Video model
     """
+    class PlaylistTypeChoices(models.TextChoices):
+        MOVIE = "MOV", "Movie"
+        SHOW = "TVS", "TV Show"
+        SEASON = "SEA", "Season"
+        PLAYLIST = "PLY", "Playlist"
+
     parent = models.ForeignKey('self', null=True, on_delete=models.SET_NULL)
     order = models.IntegerField(default=1)
     title = models.CharField(max_length=100)
+    type = models.CharField(max_length=3, choices=PlaylistTypeChoices.choices, default=PlaylistTypeChoices.PLAYLIST)
     description = models.TextField(blank=True, null=True)
     slug = models.SlugField(blank=True, null=True)
     video = models.ForeignKey(Video, related_name='playlist_featured', blank=True, null=True, on_delete=models.SET_NULL)
@@ -46,9 +53,48 @@ class Playlist(models.Model):
     def is_published(self):
         return self.active
 
+    def __str__(self):
+        return self.title
+
 
 pre_save.connect(publish_state_pre_save, sender=Playlist)
 pre_save.connect(slugify_pre_save, sender=Playlist)
+
+
+class TVShowProxyManager(PlaylistManager):
+    """ Proxy model that displays TV SHOWS only
+    """
+    def all(self):
+        return self.get_queryset().filter(parent__isnul=True, type=Playlist.PlaylistTypeChoices.SHOW)
+
+
+class TVShowProxy(Playlist):
+    """ Proxy model that displays SHOWS only
+    """
+    objects = TVShowProxyManager()
+
+    class Meta:
+        verbose_name = 'TV Show'
+        verbose_name_plural = 'TV Shows'
+        proxy = True
+
+
+class TVShowSeasonManager(PlaylistManager):
+    """ Proxy model that displays SEASONS only
+    """
+    def all(self):
+        return self.get_queryset().filter(parent__isnul=False, type=Playlist.PlaylistTypeChoices.SEASON)
+
+
+class TVShowSeasonProxy(Playlist):
+    """ Proxy model that displays SEASONS only
+    """
+    objects = TVShowSeasonManager
+
+    class Meta:
+        verbose_name = 'Season'
+        verbose_name_plural = 'Seasons'
+        proxy = True
 
 
 class PlaylistItem(models.Model):
