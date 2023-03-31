@@ -33,7 +33,7 @@ class Playlist(models.Model):
         SEASON = "SEA", "Season"
         PLAYLIST = "PLY", "Playlist"
 
-    parent = models.ForeignKey('self', null=True, on_delete=models.SET_NULL)
+    parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL)
     order = models.IntegerField(default=1)
     title = models.CharField(max_length=100)
     type = models.CharField(max_length=3, choices=PlaylistTypeChoices.choices, default=PlaylistTypeChoices.PLAYLIST)
@@ -73,6 +73,10 @@ class TVShowProxy(Playlist):
     """
     objects = TVShowProxyManager()
 
+    def save(self, *args, **kwargs):
+        self.type = Playlist.PlaylistTypeChoices.SHOW
+        super().save(*args, **kwargs)
+
     class Meta:
         verbose_name = 'TV Show'
         verbose_name_plural = 'TV Shows'
@@ -91,9 +95,35 @@ class TVShowSeasonProxy(Playlist):
     """
     objects = TVShowSeasonManager
 
+    def save(self, *args, **kwargs):
+        self.type = Playlist.PlaylistTypeChoices.SEASON
+        super().save(*args, **kwargs)
+
     class Meta:
         verbose_name = 'Season'
         verbose_name_plural = 'Seasons'
+        proxy = True
+
+
+class MovieProxyManager(PlaylistManager):
+    """ Movie manager model that displays Movie only
+    """
+    def all(self):
+        return self.get_queryset().filter(type=Playlist.PlaylistTypeChoices.MOVIE)
+
+
+class MovieProxy(Playlist):
+    """ Proxy model that displays Movie only
+    """
+    objects = MovieProxyManager
+
+    def save(self, *args, **kwargs):
+        self.type = Playlist.PlaylistTypeChoices.MOVIE
+        super().save(*args, **kwargs)
+
+    class Meta:
+        verbose_name = 'Movie'
+        verbose_name_plural = 'Movies'
         proxy = True
 
 
