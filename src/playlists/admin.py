@@ -4,7 +4,22 @@ from .models import (
     PlaylistItem,
     TVShowProxy,
     TVShowSeasonProxy,
+    MovieProxy,
 )
+
+
+class MovieProxyAdmin(admin.ModelAdmin):
+    list_display = ['title']
+    fields = ['title', 'description', 'state', 'video', 'slug']
+
+    def get_queryset(self, request):
+        return MovieProxy.objects.all()
+
+    class Meta:
+        model = MovieProxy
+
+
+admin.site.register(MovieProxy, MovieProxyAdmin)
 
 
 class SeasonEpisodeInline(admin.TabularInline):
@@ -57,6 +72,9 @@ class PlaylistAdmin(admin.ModelAdmin):
 
     class Meta:
         model = Playlist
+
+    def get_queryset(self, request):
+        return Playlist.objects.filter(type=Playlist.PlaylistTypeChoices.PLAYLIST)
 
 
 admin.site.register(Playlist, PlaylistAdmin)
