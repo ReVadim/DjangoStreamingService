@@ -10,13 +10,13 @@ from .models import (
 
 class MovieProxyAdmin(admin.ModelAdmin):
     list_display = ['title']
-    fields = ['title', 'description', 'state', 'video', 'slug']
-
-    def get_queryset(self, request):
-        return MovieProxy.objects.all()
+    fields = ['title', 'description', 'state', 'category', 'video', 'slug']
 
     class Meta:
         model = MovieProxy
+
+    def get_queryset(self, request):
+        return MovieProxy.objects.all()
 
 
 admin.site.register(MovieProxy, MovieProxyAdmin)
@@ -50,7 +50,7 @@ class TVShowSeasonProxyInline(admin.TabularInline):
 class TVSowProxyAdmin(admin.ModelAdmin):
     inlines = [TVShowSeasonProxyInline]
     list_display = ['title']
-    fields = ['title', 'description', 'state', 'video', 'slug']
+    fields = ['title', 'description', 'state', 'category', 'video', 'slug']
 
     class Meta:
         model = TVShowProxy

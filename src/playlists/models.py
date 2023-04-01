@@ -8,6 +8,7 @@ from src.djangoflix.db.receivers import (
     slugify_pre_save
 )
 from src.videos.models import Video
+from src.categories.models import Category
 
 
 class PlaylistQuerySet(models.QuerySet):
@@ -34,6 +35,7 @@ class Playlist(models.Model):
         PLAYLIST = "PLY", "Playlist"
 
     parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL)
+    category = models.ForeignKey(Category, related_name='playlists', blank=True, null=True, on_delete=models.DO_NOTHING)
     order = models.IntegerField(default=1)
     title = models.CharField(max_length=100)
     type = models.CharField(max_length=3, choices=PlaylistTypeChoices.choices, default=PlaylistTypeChoices.PLAYLIST)
@@ -65,7 +67,7 @@ class TVShowProxyManager(PlaylistManager):
     """ Proxy model that displays TV SHOWS only
     """
     def all(self):
-        return self.get_queryset().filter(parent__isnul=True, type=Playlist.PlaylistTypeChoices.SHOW)
+        return self.get_queryset().filter(parent__isnull=True, type=Playlist.PlaylistTypeChoices.SHOW)
 
 
 class TVShowProxy(Playlist):
@@ -87,13 +89,13 @@ class TVShowSeasonManager(PlaylistManager):
     """ Proxy model that displays SEASONS only
     """
     def all(self):
-        return self.get_queryset().filter(parent__isnul=False, type=Playlist.PlaylistTypeChoices.SEASON)
+        return self.get_queryset().filter(parent__isnull=False, type=Playlist.PlaylistTypeChoices.SEASON)
 
 
 class TVShowSeasonProxy(Playlist):
     """ Proxy model that displays SEASONS only
     """
-    objects = TVShowSeasonManager
+    objects = TVShowSeasonManager()
 
     def save(self, *args, **kwargs):
         self.type = Playlist.PlaylistTypeChoices.SEASON
@@ -115,7 +117,7 @@ class MovieProxyManager(PlaylistManager):
 class MovieProxy(Playlist):
     """ Proxy model that displays Movie only
     """
-    objects = MovieProxyManager
+    objects = MovieProxyManager()
 
     def save(self, *args, **kwargs):
         self.type = Playlist.PlaylistTypeChoices.MOVIE
