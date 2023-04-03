@@ -6,6 +6,7 @@ from .models import (
     TVShowSeasonProxy,
     MovieProxy,
 )
+from src.tags.admin import TaggedItemInline
 
 
 class MovieProxyAdmin(admin.ModelAdmin):
@@ -48,7 +49,7 @@ class TVShowSeasonProxyInline(admin.TabularInline):
 
 
 class TVSowProxyAdmin(admin.ModelAdmin):
-    inlines = [TVShowSeasonProxyInline]
+    inlines = [TaggedItemInline, TVShowSeasonProxyInline]
     list_display = ['title']
     fields = ['title', 'description', 'state', 'category', 'video', 'slug']
 
