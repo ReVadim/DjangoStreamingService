@@ -1,4 +1,6 @@
 from django.db import models
+from django.contrib.contenttypes.fields import GenericRelation
+from src.tags.models import TaggedItem
 
 
 class Category(models.Model):
@@ -9,6 +11,7 @@ class Category(models.Model):
     active = models.BooleanField(default=True)
     timestamp = models.DateTimeField(auto_now_add=True)
     update = models.DateTimeField(auto_now=True)
+    tags = GenericRelation(TaggedItem, related_query_name='category')
 
     def __str__(self):
         return f'Category (id={self.id}) - {self.title}'
