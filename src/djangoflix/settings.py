@@ -44,6 +44,7 @@ PROJECT_APPS = [
     'playlists.apps.PlaylistsConfig',
     'categories.apps.CategoriesConfig',
     'tags.apps.TagsConfig',
+    'ratings.apps.RatingsConfig',
 ]
 
 INSTALLED_APPS = SYSTEM_APPS + PROJECT_APPS
