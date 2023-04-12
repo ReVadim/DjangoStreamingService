@@ -1,5 +1,5 @@
-from django.views.generic import ListView
-from .models import Playlist, MovieProxy, TVShowProxy
+from django.views.generic import ListView, DetailView
+from .models import Playlist, MovieProxy, TVShowProxy, TVShowSeasonProxy
 
 
 class PlaylistMixin():
@@ -19,6 +19,41 @@ class PlaylistMixin():
 class MovieListView(PlaylistMixin, ListView):
     queryset = MovieProxy.objects.all()
     title = "Movies"
+
+
+class MovieDetailView(PlaylistMixin, DetailView):
+    template_name = 'playlists/movie_detail.html'
+    queryset = MovieProxy.objects.all()
+    title = "Movies"
+
+
+class PlaylistDetailView(PlaylistMixin, DetailView):
+    template_name = 'playlists/playlist_detail.html'
+    queryset = Playlist.objects.all()
+
+    def get_object(self, queryset=None):
+        kwargs = self.kwargs
+
+        return self.get_queryset().filter(**kwargs).first()
+
+
+class TVShowDetailView(PlaylistMixin, DetailView):
+    template_name = 'playlists/tvshow_detail.html'
+    queryset = TVShowProxy.objects.all()
+
+
+class TVShowSeasonDetailView(PlaylistMixin, DetailView):
+    template_name = 'playlists/tvshow_detail.html'
+    queryset = TVShowSeasonProxy.objects.all()
+
+    def get_object(self):
+        kwargs = self.kwargs
+        show_slug = kwargs.get("showSlug")
+        season_slug = kwargs.get("showSlug")
+        qs = self.get_queryset().filter(parent__slug__iexact=show_slug, slug__iexact=season_slug)
+        if not qs.count() == 1:
+            raise Exception("Not Found")
+        return qs.first()
 
 
 class TVShowListView(PlaylistMixin, ListView):
