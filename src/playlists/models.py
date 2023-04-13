@@ -59,6 +59,10 @@ class Playlist(models.Model):
 
     objects = PlaylistManager()
 
+    class Meta:
+        unique_together(('title', 'slug'))
+        def __str__(self):
+            return self.title
     @property
     def is_published(self):
         return self.active

@@ -1,5 +1,8 @@
+from django.http import Http404
+from django.utils import timezone
 from django.views.generic import ListView, DetailView
 from .models import Playlist, MovieProxy, TVShowProxy, TVShowSeasonProxy
+from ..djangoflix.db.models import PublishStateOptions
 
 
 class PlaylistMixin():
@@ -46,14 +49,33 @@ class TVShowSeasonDetailView(PlaylistMixin, DetailView):
     template_name = 'playlists/tvshow_detail.html'
     queryset = TVShowSeasonProxy.objects.all()
 
-    def get_object(self):
+    def get_object(self, request):
         kwargs = self.kwargs
         show_slug = kwargs.get("showSlug")
         season_slug = kwargs.get("showSlug")
-        qs = self.get_queryset().filter(parent__slug__iexact=show_slug, slug__iexact=season_slug)
-        if not qs.count() == 1:
-            raise Exception("Not Found")
-        return qs.first()
+        now = timezone.now()
+        try:
+            obj = TVShowSeasonProxy.objects.get(
+                state=PublishStateOptions.PUBLISH,
+                publish_timestamp__lte=now,
+                parent__slug__iexact=show_slug,
+                slug__iexact=season_slug
+            )
+        except TVShowSeasonProxy.MultipleObjectsReturned:
+            qs = TVShowSeasonProxy.objects.filter(
+                parent__slug__iexact=show_slug,
+                slug__iexact=season_slug
+            ).publish()
+            obj = qs.first()
+            obj = None
+        except:
+            raise Http404
+
+        return obj
+        # qs = self.get_queryset().filter(parent__slug__iexact=show_slug, slug__iexact=season_slug)
+        # if not qs.count() == 1:
+        #     raise Exception("Not Found")
+        # return qs.first()
 
 
 class TVShowListView(PlaylistMixin, ListView):
