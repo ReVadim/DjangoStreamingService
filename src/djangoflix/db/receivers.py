@@ -1,6 +1,7 @@
 from django.utils import timezone
 from django.utils.text import slugify
 from src.djangoflix.db.models import PublishStateOptions
+from .utils import get_unique_slug
 
 
 def publish_state_pre_save(sender, instance, *args, **kwargs):
@@ -21,3 +22,9 @@ def slugify_pre_save(sender, instance, *args, **kwargs):
         instance.slug = slugify(title)
 
 
+def unique_slugify_pre_save(sender, instance, *args, **kwargs):
+    """ Receiver function for slug"""
+    title = instance.title
+    slug = instance.slug
+    if slug is None:
+        instance.slug = get_unique_slug(instance, size=5)
