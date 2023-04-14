@@ -6,7 +6,7 @@ from django.db.models import Avg, Max, Min
 from src.djangoflix.db.models import PublishStateOptions
 from src.djangoflix.db.receivers import (
     publish_state_pre_save,
-    slugify_pre_save
+    unique_slugify_pre_save,
 )
 from src.ratings.models import Rating
 from src.videos.models import Video
@@ -60,9 +60,13 @@ class Playlist(models.Model):
     objects = PlaylistManager()
 
     class Meta:
-        unique_together(('title', 'slug'))
+        constraints = [
+            models.UniqueConstraint(fields=['title', 'slug'], name='unique_slug')
+        ]
+
         def __str__(self):
             return self.title
+
     @property
     def is_published(self):
         return self.active
@@ -166,13 +170,13 @@ class PlaylistItem(models.Model):
 
 
 pre_save.connect(publish_state_pre_save, sender=TVShowProxy)
-pre_save.connect(slugify_pre_save, sender=TVShowProxy)
+pre_save.connect(unique_slugify_pre_save, sender=TVShowProxy)
 
 pre_save.connect(publish_state_pre_save, sender=MovieProxy)
-pre_save.connect(slugify_pre_save, sender=MovieProxy)
+pre_save.connect(unique_slugify_pre_save, sender=MovieProxy)
 
 pre_save.connect(publish_state_pre_save, sender=TVShowSeasonProxy)
-pre_save.connect(slugify_pre_save, sender=TVShowSeasonProxy)
+pre_save.connect(unique_slugify_pre_save, sender=TVShowSeasonProxy)
 
 pre_save.connect(publish_state_pre_save, sender=Playlist)
-pre_save.connect(slugify_pre_save, sender=Playlist)
+pre_save.connect(unique_slugify_pre_save, sender=Playlist)
