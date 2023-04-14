@@ -43,6 +43,9 @@ class TVShowProxyModelTestCase(TestCase):
         self.assertTrue(seasons.exists())
         self.assertEqual(seasons.count(), 5)
 
+    def test_season_slug_unique(self):
+        self.assertNotEqual(self.season_1.slug, self.season_11.slug)
+
     def test_playlist_video(self):
         self.assertEqual(self.obj_a.video, self.video_a)
 
