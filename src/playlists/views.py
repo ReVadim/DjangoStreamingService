@@ -5,7 +5,7 @@ from .models import Playlist, MovieProxy, TVShowProxy, TVShowSeasonProxy
 from ..djangoflix.db.models import PublishStateOptions
 
 
-class PlaylistMixin():
+class PlaylistMixin:
     template_name = 'playlist_list.html'
     title = None
 
@@ -46,13 +46,13 @@ class TVShowDetailView(PlaylistMixin, DetailView):
 
 
 class TVShowSeasonDetailView(PlaylistMixin, DetailView):
-    template_name = 'playlists/tvshow_detail.html'
+    template_name = 'playlists/season_detail.html'
     queryset = TVShowSeasonProxy.objects.all()
 
-    def get_object(self, request):
+    def get_object(self):
         kwargs = self.kwargs
         show_slug = kwargs.get("showSlug")
-        season_slug = kwargs.get("showSlug")
+        season_slug = kwargs.get("seasonSlug")
         now = timezone.now()
         try:
             obj = TVShowSeasonProxy.objects.get(
@@ -65,12 +65,10 @@ class TVShowSeasonDetailView(PlaylistMixin, DetailView):
             qs = TVShowSeasonProxy.objects.filter(
                 parent__slug__iexact=show_slug,
                 slug__iexact=season_slug
-            ).publish()
+            ).published()
             obj = qs.first()
-            obj = None
         except:
             raise Http404
-
         return obj
         # qs = self.get_queryset().filter(parent__slug__iexact=show_slug, slug__iexact=season_slug)
         # if not qs.count() == 1:
@@ -84,5 +82,6 @@ class TVShowListView(PlaylistMixin, ListView):
 
 
 class FeaturedPlaylistListView(PlaylistMixin, ListView):
+    template_name = 'playlists/featured_list.html'
     queryset = Playlist.objects.featured_playlist()
     title = "Featured"

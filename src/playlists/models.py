@@ -114,10 +114,11 @@ class TVShowProxy(Playlist):
 
     @property
     def seasons(self):
+
         return self.playlist_set.published()
 
     def get_short_display(self):
-        return f"{self.seasons.count()} seasons"
+        return f" - {self.seasons.count()} seasons"
 
     class Meta:
         verbose_name = 'TV Show'
@@ -211,6 +212,8 @@ class PlaylistItem(models.Model):
     video = models.ForeignKey(Video, on_delete=models.CASCADE)
     order = models.IntegerField(default=1)
     timestamp = models.DateTimeField(auto_now_add=True)
+
+    objects = PlaylistItemManager()
 
     class Meta:
         ordering = ['order', '-timestamp']
