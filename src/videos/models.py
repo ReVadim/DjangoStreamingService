@@ -82,3 +82,8 @@ class VideoPublishedProxy(Video):
 pre_save.connect(publish_state_pre_save, sender=Video)
 pre_save.connect(slugify_pre_save, sender=Video)
 
+pre_save.connect(publish_state_pre_save, sender=VideoAllProxy)
+pre_save.connect(slugify_pre_save, sender=VideoAllProxy)
+
+pre_save.connect(publish_state_pre_save, sender=VideoPublishedProxy)
+pre_save.connect(slugify_pre_save, sender=VideoPublishedProxy)
