@@ -5,6 +5,7 @@ from .models import (
     TVShowProxy,
     TVShowSeasonProxy,
     MovieProxy,
+    PlaylistRelated,
 )
 from src.tags.admin import TaggedItemInline
 
@@ -64,14 +65,20 @@ class TVSowProxyAdmin(admin.ModelAdmin):
 admin.site.register(TVShowProxy, TVSowProxyAdmin)
 
 
+class PlaylistRelatedInline(admin.TabularInline):
+    model = PlaylistRelated
+    fk_name = 'playlist'
+    extra = 0
+
+
 class PlaylistItemInline(admin.TabularInline):
     model = PlaylistItem
     extra = 0
 
 
 class PlaylistAdmin(admin.ModelAdmin):
-    inlines = [PlaylistItemInline, TaggedItemInline]
-    fields = ['title', 'description', 'slug', 'state', 'active']
+    inlines = [PlaylistRelatedInline, PlaylistItemInline]
+    # fields = ['title', 'description', 'slug', 'state', 'active']
 
     class Meta:
         model = Playlist

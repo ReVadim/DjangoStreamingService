@@ -2,7 +2,7 @@ from django.db import models
 from django.utils import timezone
 from django.db.models.signals import pre_save
 from django.contrib.contenttypes.fields import GenericRelation
-from django.db.models import Avg, Max, Min
+from django.db.models import Avg, Max, Min, Q
 from src.djangoflix.db.models import PublishStateOptions
 from src.djangoflix.db.receivers import (
     publish_state_pre_save,
@@ -41,6 +41,7 @@ class Playlist(models.Model):
         PLAYLIST = "PLY", "Playlist"
 
     parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL)
+    related = models.ManyToManyField('self', blank=True, related_name='related', through='PlaylistRelated')
     category = models.ForeignKey(Category, related_name='playlists', blank=True, null=True, on_delete=models.DO_NOTHING)
     order = models.IntegerField(default=1)
     title = models.CharField(max_length=100)
@@ -114,7 +115,6 @@ class TVShowProxy(Playlist):
 
     @property
     def seasons(self):
-
         return self.playlist_set.published()
 
     def get_short_display(self):
@@ -217,6 +217,21 @@ class PlaylistItem(models.Model):
 
     class Meta:
         ordering = ['order', '-timestamp']
+
+
+def playlist_related_limit_choices_to():
+    return Q(type=Playlist.PlaylistTypeChoices.MOVIE) | Q(type=Playlist.PlaylistTypeChoices.SHOW)
+
+
+class PlaylistRelated(models.Model):
+    playlist = models.ForeignKey(Playlist, on_delete=models.CASCADE)
+    related = models.ForeignKey(
+        Playlist, on_delete=models.CASCADE,
+        related_name='related_item',
+        limit_choices_to=playlist_related_limit_choices_to
+    )
+    order = models.IntegerField(default=1)
+    timestamp = models.DateTimeField(auto_now_add=True)
 
 
 pre_save.connect(publish_state_pre_save, sender=TVShowProxy)
