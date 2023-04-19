@@ -1,6 +1,10 @@
 from django.db import models
 from django.contrib.contenttypes.fields import GenericRelation
+from django.db.models.signals import pre_save
+
 from src.tags.models import TaggedItem
+
+from src.djangoflix.db.receivers import unique_slugify_pre_save
 
 
 class Category(models.Model):
@@ -19,3 +23,6 @@ class Category(models.Model):
     class Meta:
         verbose_name = 'Category'
         verbose_name_plural = 'Categories'
+
+
+pre_save.connect(unique_slugify_pre_save, sender=Category)
