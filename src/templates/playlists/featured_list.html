@@ -16,9 +16,9 @@
             <p>{{ instance.description }}</p>
             {% for item in instance.get_related_items %}
                 {% if item.related.is_movie %}
-                {% include 'playlists/cards/movie.html' with movie=item.related %}
+                    {% include 'playlists/cards/movie.html' with movie=item.related %}
                 {% elif item.related.is_show %}
-                {% include 'playlists/cards/show.html' with show=item.related %}
+                    {% include 'playlists/cards/show.html' with show=item.related %}
                 {% else %}
                 {% endif %}
             {% endfor %}
