@@ -1,4 +1,5 @@
 from django.http import Http404
+from django.db.models import Count
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.views.generic import ListView
 from src.playlists.models import Playlist
@@ -10,7 +11,7 @@ from src.playlists.mixins import PlaylistMixin
 class CategoryListView(ListView):
     """ Category model list view
     """
-    queryset = Category.objects.all().filter(active=True)
+    queryset = Category.objects.all().filter(active=True).annotate(pl_count=Count('playlists')).filter(pl_count__gt=0)
 
 
 class CategoryDetailView(PlaylistMixin, ListView):
@@ -35,4 +36,4 @@ class CategoryDetailView(PlaylistMixin, ListView):
 
     def get_queryset(self):
         slug = self.kwargs.get('slug')
-        return Playlist.objects.filter(category__slug=slug)
+        return Playlist.objects.filter(category__slug=slug).movie_or_show()

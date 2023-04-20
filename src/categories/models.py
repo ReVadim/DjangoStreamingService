@@ -20,6 +20,9 @@ class Category(models.Model):
     def __str__(self):
         return f'Category (id={self.id}) - {self.title}'
 
+    def get_absolute_url(self):
+        return f"/category/{self.slug}"
+
     class Meta:
         verbose_name = 'Category'
         verbose_name_plural = 'Categories'
