@@ -77,7 +77,7 @@ class PlaylistItemInline(admin.TabularInline):
 
 
 class PlaylistAdmin(admin.ModelAdmin):
-    inlines = [PlaylistRelatedInline, PlaylistItemInline]
+    inlines = [PlaylistRelatedInline, PlaylistItemInline, TaggedItemInline]
     # fields = ['title', 'description', 'slug', 'state', 'active']
 
     class Meta:

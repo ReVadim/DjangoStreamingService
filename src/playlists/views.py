@@ -3,20 +3,7 @@ from django.utils import timezone
 from django.views.generic import ListView, DetailView
 from .models import Playlist, MovieProxy, TVShowProxy, TVShowSeasonProxy
 from ..djangoflix.db.models import PublishStateOptions
-
-
-class PlaylistMixin:
-    template_name = 'playlist_list.html'
-    title = None
-
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(*args, **kwargs)
-        if self.title is not None:
-            context['title'] = self.title
-        return context
-
-    def get_queryset(self):
-        return super().get_queryset().published()
+from .mixins import PlaylistMixin
 
 
 class MovieListView(PlaylistMixin, ListView):
@@ -24,20 +11,32 @@ class MovieListView(PlaylistMixin, ListView):
     title = "Movies"
 
 
-class MovieDetailView(PlaylistMixin, DetailView):
+class SearchView(PlaylistMixin, ListView):
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data()
+        query = self.request.GET.get("q")
+        if query is not None:
+            context['title'] = f"Search for {query}"
+        else:
+            context['title'] = 'Perform a search'
+        return context
+
+    def get_queryset(self):
+        request = self.request
+        query = request.GET.get("q")  # request.GET = {}
+
+        return Playlist.objects.all().movie_or_show().search(query=query)
+
+
+class MovieDetailView(PlaylistMixin, ListView):
     template_name = 'playlists/movie_detail.html'
     queryset = MovieProxy.objects.all()
-    title = "Movies"
 
 
 class PlaylistDetailView(PlaylistMixin, DetailView):
     template_name = 'playlists/playlist_detail.html'
     queryset = Playlist.objects.all()
-
-    def get_object(self, queryset=None):
-        kwargs = self.kwargs
-
-        return self.get_queryset().filter(**kwargs).first()
 
 
 class TVShowDetailView(PlaylistMixin, DetailView):

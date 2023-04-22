@@ -19,6 +19,24 @@ class PlaylistQuerySet(models.QuerySet):
         now = timezone.now()
         return self.filter(state=PublishStateOptions.PUBLISH, publish_timestamp__lte=now)
 
+    def movie_or_show(self):
+        return self.filter(
+            Q(type=Playlist.PlaylistTypeChoices.MOVIE) |
+            Q(type=Playlist.PlaylistTypeChoices.SHOW)
+        )
+
+    def search(self, query=None):
+        """ Custom queryset"""
+        if query is None:
+            return self
+        return self.filter(
+            Q(title__icontains=query) |
+            Q(description__icontains=query) |
+            Q(category__title__icontains=query) |
+            Q(category__slug__icontains=query) |
+            Q(tags__tag__icontains=query)
+        ).distinct()
+
 
 class PlaylistManager(models.Manager):
     def get_queryset(self):
@@ -65,9 +83,6 @@ class Playlist(models.Model):
             models.UniqueConstraint(fields=['title', 'slug'], name='unique_slug')
         ]
 
-        def __str__(self):
-            return self.title
-
     @property
     def is_published(self):
         return self.active
@@ -76,17 +91,17 @@ class Playlist(models.Model):
         return self.title
 
     def get_related_items(self):
-        return self.playlistrelated__set.all()
+        return self.playlistrelated_set.all()
 
     def get_absolute_url(self):
         if self.is_movie:
-            return f'/movies/{self.slug}'
+            return f'/movies/{self.slug}/'
         if self.is_show:
-            return f'/shows/{self.slug}'
+            return f'/shows/{self.slug}/'
         if self.is_season and self.parent is not None:
-            return f'/shows/{self.parent.slug}/seasons/{self.slug}'
+            return f'/shows/{self.parent.slug}/seasons/{self.slug}/'
 
-        return f'playlists/{self.slug}'
+        return f'playlists/{self.slug}/'
 
     @property
     def is_season(self):
