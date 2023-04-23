@@ -28,7 +28,7 @@ class PlaylistQuerySet(models.QuerySet):
     def search(self, query=None):
         """ Custom queryset"""
         if query is None:
-            return self
+            return self.none()
         return self.filter(
             Q(title__icontains=query) |
             Q(description__icontains=query) |
