@@ -1,7 +1,7 @@
 from django.http import Http404
 from django.utils import timezone
 from django.views.generic import ListView, DetailView
-from .models import Playlist, MovieProxy, TVShowProxy, TVShowSeasonProxy
+from src.playlists.models import Playlist, MovieProxy, TVShowProxy, TVShowSeasonProxy
 from ..djangoflix.db.models import PublishStateOptions
 from .mixins import PlaylistMixin
 
@@ -23,13 +23,12 @@ class SearchView(PlaylistMixin, ListView):
         return context
 
     def get_queryset(self):
-        request = self.request
-        query = request.GET.get("q")  # request.GET = {}
+        query = self.request.GET.get("q")  # request.GET = {}
 
         return Playlist.objects.all().movie_or_show().search(query=query)
 
 
-class MovieDetailView(PlaylistMixin, ListView):
+class MovieDetailView(PlaylistMixin, DetailView):
     template_name = 'playlists/movie_detail.html'
     queryset = MovieProxy.objects.all()
 
