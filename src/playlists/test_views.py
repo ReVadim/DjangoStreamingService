@@ -18,7 +18,7 @@ class PlaylistViewTestCase(TestCase):
     def test_shows_count(self):
         qs = TVShowProxy.objects.all()
         self.assertEqual(qs.count(), 2)
-    #
+
     def test_show_detail_view(self):
         show = TVShowProxy.objects.all().published().first()
         url = show.get_absolute_url()
@@ -69,3 +69,24 @@ class PlaylistViewTestCase(TestCase):
         context = response.context
         response_qs = context['object_list']
         self.assertQuerysetEqual(movie_qs.order_by('-timestamp'), response_qs.order_by('-timestamp'))
+
+    def test_search_view(self):
+        query = None
+        response = self.client.get("/search/")
+        playlist_qs = Playlist.objects.none()
+        self.assertEqual(response.status_code, 200)
+        context = response.context
+        response_qs = context['object_list']
+
+        self.assertQuerysetEqual(playlist_qs.order_by('-timestamp'), response_qs.order_by('-timestamp'))
+        self.assertContains(response, 'Perform a search')  # title from SearchView
+
+    def test_search_result_view(self):
+        query = "Action"
+        response = self.client.get(f"/search/?q={query}")
+        playlist_qs = Playlist.objects.all().search(query=query)
+        self.assertEqual(response.status_code, 200)
+        context = response.context
+        response_qs = context['object_list']
+        self.assertQuerysetEqual(playlist_qs.order_by('-timestamp'), response_qs.order_by('-timestamp'))
+        self.assertContains(response, f'Search for {query}')  # title from SearchView where query is not None
