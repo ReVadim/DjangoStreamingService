@@ -23,7 +23,10 @@ from src.playlists.views import (
     PlaylistDetailView,
     TVShowDetailView,
     TVShowSeasonDetailView,
+    SearchView,
 )
+from src.ratings.views import rate_object_view
+
 
 urlpatterns = [
     path('', FeaturedPlaylistListView.as_view()),
@@ -38,4 +41,6 @@ urlpatterns = [
     path('shows/<slug:slug>/', TVShowDetailView.as_view()),
     path('shows/', TVShowListView.as_view()),
     path('tags/', include('tags.urls')),
+    path('search/', SearchView.as_view()),
+    path('object-rate/', rate_object_view)
 ]
