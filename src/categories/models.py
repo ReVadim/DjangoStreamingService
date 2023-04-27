@@ -14,7 +14,7 @@ class Category(models.Model):
     slug = models.SlugField(blank=True, null=True)
     active = models.BooleanField(default=True)
     timestamp = models.DateTimeField(auto_now_add=True)
-    update = models.DateTimeField(auto_now=True)
+    updated = models.DateTimeField(auto_now=True)
     tags = GenericRelation(TaggedItem, related_query_name='category')
 
     def __str__(self):
