@@ -1,6 +1,7 @@
-from django.http import HttpResponseRedirect
-from src.ratings.forms import RatingForm
 from django.contrib.contenttypes.models import ContentType
+from django.http import HttpResponseRedirect
+
+from src.ratings.forms import RatingForm
 from src.ratings.models import Rating
 
 
